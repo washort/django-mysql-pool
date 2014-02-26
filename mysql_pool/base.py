@@ -2,6 +2,7 @@ from sqlalchemy.pool import manage, QueuePool
 from sqlalchemy import event
 
 from django.conf import settings
+from django.db.utils import DatabaseError
 from django.utils import importlib
 from functools import partial
 
@@ -93,10 +94,13 @@ class DatabaseWrapper(backend_module.DatabaseWrapper):
         # If you don't want django to check that the connection is valid,
         # then set DATABASE_POOL_CHECK to False.
         if getattr(settings, 'DATABASE_POOL_CHECK', True):
-            if self.connection is None:
-                return False
-            else:
-                return self.is_usable()
+            if self.connection is not None:
+                try:
+                    self.connection.ping()
+                    return True
+                except DatabaseError:
+                    self.connection.close()
+                    self.connection = None
         return False
 
     def _cursor(self):
