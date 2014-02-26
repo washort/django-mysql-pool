@@ -93,7 +93,10 @@ class DatabaseWrapper(backend_module.DatabaseWrapper):
         # If you don't want django to check that the connection is valid,
         # then set DATABASE_POOL_CHECK to False.
         if getattr(settings, 'DATABASE_POOL_CHECK', True):
-            return self._valid_connection()
+            if self.connection is None:
+                return False
+            else:
+                return self.is_usable()
         return False
 
     def _cursor(self):
@@ -101,9 +104,9 @@ class DatabaseWrapper(backend_module.DatabaseWrapper):
             _settings = self._serialize()
             self.connection = db_pool.connect(**_settings)
 
-            self.connection.encoders[backend_module.SafeUnicode] =\
+            self.connection.encoders[backend_module.SafeText] =\
                     self.connection.encoders[unicode]
-            self.connection.encoders[backend_module.SafeString] =\
+            self.connection.encoders[backend_module.SafeBytes] =\
                     self.connection.encoders[str]
 
             backend_module.connection_created.send(sender=self.__class__,
