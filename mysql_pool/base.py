@@ -118,7 +118,7 @@ class DatabaseWrapper(backend_module.DatabaseWrapper):
 
 
     def _cursor(self):
-        if not self._is_valid_connection():
+        while not self._is_valid_connection():
             _settings = self._serialize()
             self.connection = db_pool.connect(**_settings)
 
