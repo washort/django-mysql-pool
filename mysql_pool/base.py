@@ -98,10 +98,24 @@ class DatabaseWrapper(backend_module.DatabaseWrapper):
                 try:
                     self.connection.ping()
                     return True
-                except DatabaseError:
-                    self.connection.close()
+                except (backend_module.Database.DatabaseError,
+                        backend_module.Database.OperationalError):
+                    try:
+                        self.connection.close()
+                    except (backend_module.Database.DatabaseError,
+                            backend_module.Database.OperationalError):
+                        pass
                     self.connection = None
         return False
+
+    def _commit(self):
+        if self.connection is not None and self._is_valid_connection():
+            return self.connection.commit()
+
+    def _rollback(self):
+        if self.connection is not None and self._is_valid_connection():
+            return self.connection.rollback()
+
 
     def _cursor(self):
         if not self._is_valid_connection():
