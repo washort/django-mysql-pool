@@ -80,6 +80,7 @@ class DatabaseWrapper(backend_module.DatabaseWrapper):
             kwargs['host'] = settings_dict['HOST']
         if settings_dict['PORT']:
             kwargs['port'] = int(settings_dict['PORT'])
+        kwargs['autocommit'] = settings_dict['AUTOCOMMIT']
         # We need the number of potentially affected rows after an
         # "UPDATE", not the number of changed rows.
         kwargs['client_flag'] = backend_module.CLIENT.FOUND_ROWS
