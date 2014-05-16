@@ -57,6 +57,7 @@ class DatabaseWrapper(backend_module.DatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
         self.creation = DatabaseCreation(self)
+        self.autocommit = self.settings_dict['AUTOCOMMIT']
 
     def _serialize(self, settings_dict=None):
         if settings_dict is None:
