@@ -92,6 +92,10 @@ class DatabaseWrapper(backend_module.DatabaseWrapper):
         kwargs['sa_pool_key'] = serialize(**kwargs)
         return kwargs
 
+    def set_autocommit(self, val):
+        self._is_valid_connection()
+        return super(DatabaseWrapper, self).set_autocommit(val)
+
     def _is_valid_connection(self):
         # If you don't want django to check that the connection is valid,
         # then set DATABASE_POOL_CHECK to False.
